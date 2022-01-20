@@ -1,78 +1,81 @@
+import Operation from "./operation.js";
+
 export default class Product {
     
-    countGet() {
-        const field = document.createElement('input');
-        field.type = 'text';
-        field.placeholder = 'Count';
-        field.value = this.count;
-        field.addEventListener('blur', () => {
-            this.count = field.value;
-            this.countHalfproduct();
-            console.log(this);
-        });
-        return field;
+    #btnCreate(title = '', layout, thisItem, params = {}, once=false) {
+        let btn = document.createElement('button');
+        btn.classList.add('button', 'is-small', 'is-rounded');
+        btn.innerText = title;
+        btn.addEventListener('click', () => {
+            let newItem = new layout(params);
+            this.view.appendChild(newItem.view);
+            !once ? thisItem.push(newItem) : this[thisItem] = newItem;
+        }, {once:once});
+        return btn;
     }
 
-    titleGet() {
+    #inputCreate(inputType = 'text', placeholder = '', thisProperty) {
         const field = document.createElement('input');
-        field.type = 'text';
-        field.placeholder = 'Title';
-        field.value = this.title;
+        field.type = inputType;
+        field.placeholder = placeholder;
+        field.value = thisProperty ? thisProperty : '';
         field.addEventListener('blur', () => {
-            this.title = field.value;
-            this.countHalfproduct();
-            console.log(this);
-        });
-        return field;
-    }
-
-    widthGet() {
-        const field = document.createElement('input');
-        field.type = 'text';
-        field.placeholder = 'Width';
-        field.value = this.width;
-        field.addEventListener('blur', () => {
-            this.width = field.value;
-            this.countHalfproduct();
-            console.log(this);
-        });
-        return field;
-    }
-
-    heightGet() {
-        const field = document.createElement('input');
-        field.type = 'text';
-        field.placeholder = 'Height';
-        field.value = this.height;
-        field.addEventListener('blur', () => {
-            this.height = field.value;
-            this.countHalfproduct();
-            console.log(this);
+            thisProperty = field.value;
         });
         return field;
     }
 
     render() {
-        this.view.appendChild(this.titleGet());
-        this.view.appendChild(this.countGet());
-        this.view.appendChild(this.widthGet());
-        this.view.appendChild(this.heightGet());
+        let elements = [];
+        let buttons = [];
+        elements.push(this.#inputCreate('text', 'Название', this.title))
+        elements.push(this.#inputCreate('number', 'Тираж', this.printrun))
+        buttons.push(this.#btnCreate('Добавить техоперацию', Operation, 'operation',{parent: this},true));
+
+        let inputs = document.createElement('div');
+        inputs.classList.add('block');
+        for(let element of elements) {
+            inputs.appendChild(element);
+        };
+        this.view.appendChild(inputs);
+
+        let btnBlock = document.createElement('div');
+        btnBlock.classList.add('buttons');
+        for (let button of buttons) {
+            btnBlock.appendChild(button);
+        };
+        this.view.appendChild(btnBlock);
     }
 
-    countHalfproduct() {
-        this.halfproduct.title = 'Print Sheet';
-        this.halfproduct.count = this.count / 4;
-        this.halfproduct.width = this.height * 2;
-        this.halfproduct.height = this.width * 2;
+    #printrunCalc(printrun=0) {
+        if (this.parent) {
+            this.printrun = Math.ceil(this.parent.printrun / (1 - this.parent.wastePersent/100));
+        } else {
+            this.printrun = printrun;
+        }
     }
 
-    constructor(halfproduct = null, title = '', count = '', width = '', height = '') {
-        this.title = title;
-        this.count = count;
-        this.width = width;
-        this.height = height;
+    constructor(data) {
+        /*
+        *   title
+        *   printrun
+        * 
+        * 
+        * 
+        */
+        for (let key in data) {
+            this[key] = data[key];
+        };
         this.view = document.createElement('div');
+        this.view.classList.add('box', 'product');
+        this.#printrunCalc(this.printrun ? this.printrun : 0);
         this.render();
-        this.halfproduct = halfproduct;
+
+        //=========================DEBUG===================================
+        this.view.addEventListener('keyup', (event)=> {
+            if (event.code=='PrintScreen') {
+                console.log(this);
+            };
+        });
     }
 }

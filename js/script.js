@@ -2,10 +2,8 @@
 
 import Product from "./product.js";
 
-const body = document.querySelector('#body');
+const wrapper = document.querySelector('#wrapper');
 
-let printSheet = new Product();
-let flyer = new Product(printSheet,'Листовка');
+let booklet = new Product({title: 'Брошюра',printrun: 1000});
 
-
-body.appendChild(flyer.view);
+wrapper.appendChild(booklet.view);
