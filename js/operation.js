@@ -36,14 +36,14 @@ export default class Operation {
     }
 
     init(data = []) {
-        // this.title = data[0] ? data[0] : '';
-        // this.type = data[1] ? data[1] : '';
-        // this.wastePersent.value = data[2] ? data[2] : '';
         this.view.appendChild(this.mo.view);
         this.view.appendChild(this.printrun.view);
         this.view.appendChild(this.wastePersent.view);
         this.view.appendChild(new Button(this, 'Добавить материал', Material, this.materials = [], {parent: this}));
         this.view.appendChild(new Button(this, 'Добавить полуфабрикат', Product, this.halfproducts = [], {parent: this, title:''}));
+        this.title = data[0] ? data[0] : '';
+        this.type = data[1] ? data[1] : '';
+        this.wastePersent.value = data[2] ? data[2] : '';
     }
 
     update(data) {
@@ -61,14 +61,22 @@ export default class Operation {
         return Math.ceil(value / (1 - this.wastePersent.value/100));
     }
 
+    #calcField(field,value) {
+        if (field=='printrun') {
+            return Math.ceil(value / (1 - this.wastePersent.value/100));
+        };
+        return value;
+
+    }
+
     updateField(field, value, internal=false) {
         if (!internal) {
-            this[field].value = value;
+                this[field].value = this.#calcField(field, value);
         };
         if (this.halfproducts) {
             for(let halfproduct of this.halfproducts) {
                 if (halfproduct[field]) {
-                    halfproduct.updateField(field,value,false);
+                    halfproduct.updateField(field,this.#calcField(field, value),false);
                 }
             }
         }        
