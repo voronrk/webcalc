@@ -86,5 +86,11 @@ export default class Material {
             .then(data =>{
                 this.select(data);
             });
+        //=========================DEBUG===================================
+        this.view.addEventListener('click', (e)=> {
+            if (e.target.classList.contains('box')) {
+                console.log(this);
+            };
+        });
     }
 }

@@ -1,5 +1,7 @@
 import Material from "./material.js";
 import Product from "./product.js";
+import Button from "./button.js";
+import Input from "./input.js";
 
 export default class Operation {
 
@@ -28,38 +30,48 @@ export default class Operation {
         `;
         select.children[0].value = '';
         select.addEventListener('change', (e) => {
-            this.init(data[e.target.value]);
+            this.update(data[e.target.value]);
         });
         this.view.appendChild(select);
     }
 
-    #btnCreate(title, layout, thisItem, params = {}, once=false) {
-        let btn = document.createElement('button');
-        btn.classList.add('button', 'is-small', 'is-rounded');
-        btn.innerText = title;
-        btn.addEventListener('click', () => {
-            let newItem = new layout({parent:this});
-            this.view.appendChild(newItem.view);
-            !once ? thisItem.push(newItem) : this[thisItem] = newItem;
-        }, {once:once});
-        return btn;
+    init(data = []) {
+        // this.title = data[0] ? data[0] : '';
+        // this.type = data[1] ? data[1] : '';
+        // this.wastePersent.value = data[2] ? data[2] : '';
+        this.view.appendChild(this.mo.view);
+        this.view.appendChild(this.printrun.view);
+        this.view.appendChild(this.wastePersent.view);
+        this.view.appendChild(new Button(this, 'Добавить материал', Material, this.materials = [], {parent: this}));
+        this.view.appendChild(new Button(this, 'Добавить полуфабрикат', Product, this.halfproducts = [], {parent: this, title:''}));
     }
 
-    init(data) {
-        this.title = data[0];         
-        this.type = data[1];           
-        this.wastePersent = data[2];
-        console.log(this);
-    }
-
-    get printrunInput() {
-        return Math.ceil(this.printrunOutput / (1 - this.wastePersent/100));
+    update(data) {
+        this.title = data[0];
+        this.type = data[1];
+        this.wastePersent.value = data[2];
+        this.printrun.value = this.#printrunCalc(this.parent.printrun.value);
     }
 
     render() {
         this.select();
-        this.view.appendChild(this.#btnCreate('Добавить материал', Material, this.materials = []));
-        this.view.appendChild(this.#btnCreate('Добавить полуфабрикат', Product, this.halfproducts = []));
+    }
+
+    #printrunCalc(value) {
+        return Math.ceil(value / (1 - this.wastePersent.value/100));
+    }
+
+    updateField(field, value, internal=false) {
+        if (!internal) {
+            this[field].value = value;
+        };
+        if (this.halfproducts) {
+            for(let halfproduct of this.halfproducts) {
+                if (halfproduct[field]) {
+                    halfproduct.updateField(field,value,false);
+                }
+            }
+        }        
     }
 
     constructor(data) {
@@ -71,15 +83,26 @@ export default class Operation {
         * wasteQuantity    Количество техотходов
         * printrunOutput   Выходной тираж
         * printrunInput    Входной тираж
+        * mo               Доля
         */
         for (let key in data) {
             this[key] = data[key];
         };
-        console.log(this);
-        this.printrun = this.parent.printrun;
+        this.wastePersent = new Input(this, 'wastePersent', this.parent.wastePersent ? this.parent.wastePersent.value : 0, '% техотходов', 'number', true, 'disabled');
+        this.mo = new Input(this, 'mo', '', 'Доля', 'number', true);
+        this.printrun = new Input(this, 'printrun', this.#printrunCalc(this.parent.printrun.value), 'Тираж', 'number', true, 'disabled');
 
         this.view = document.createElement('div');
         this.view.classList.add('box', 'operation');
-        this.render();        
+        this.render();
+        this.init();        
+        
+        //=========================DEBUG===================================
+        this.view.addEventListener('click', (e)=> {
+            if (e.target.classList.contains('box')) {
+                e.stopPropagation();
+                console.log(this);
+            };
+        });
     }
 }
