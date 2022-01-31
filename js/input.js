@@ -23,7 +23,7 @@ export default class Input {
         
         this.disabled = disabled;
 
-        this.view = document.createElement('div');
+        this.view = document.createElement('p');
         this.view.classList.add('field');
         this.view.innerHTML = `
             <label class="label is-small">${this.placeholder}</label>

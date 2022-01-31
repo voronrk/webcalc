@@ -6,7 +6,7 @@ export default class Product {
     
     render() {
         let inputsWrapper = document.createElement('div');
-        inputsWrapper.classList.add('block');
+        inputsWrapper.classList.add('field', 'is-grouped');
         for(let key in this) {
             if ((!(key=='parent')) && (!(key=='children')) && (this[key].view)) {
                 inputsWrapper.appendChild(this[key].view)
@@ -22,7 +22,6 @@ export default class Product {
 
     updateField(field, value, internal=true) {
         if (!internal) {
-            console.log(this[field]);
             this[field].value = value;
         };
         if (this.children) {
@@ -47,19 +46,19 @@ export default class Product {
         this.printrun = new Input(this, 'printrun', '', 'Тираж', 'number', true);
         this.x = new Input(this, 'x', '', 'X', 'number', true);
         this.y = new Input(this, 'y', '', 'Y', 'number', true);
-        this.z = new Input(this, 'z', '', 'Z', 'number', true);
+        // this.z = new Input(this, 'z', '', 'Z', 'number', true);
         
         if (data.parent) {
-            this.printrun.value = data.parent.printrun;
+            this.printrun.value = data.parent.printrun.value;
             this.x.value = data.parent.x;
             this.y.value = data.parent.y;
-            this.z.value = data.parent.z;
+            // this.z.value = data.parent.z;
         } else {
             this.title.value = data.title;
             this.printrun.value = data.printrun;
             this.x.value = data.x;
             this.y.value = data.y;
-            this.z.value = data.z;
+            // this.z.value = data.z;
         }
 
         this.view = document.createElement('div');

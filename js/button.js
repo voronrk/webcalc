@@ -15,7 +15,6 @@ export default class Button {
         btn.addEventListener('click', () => {
             let newItem = new layout(params);
             parent.view.appendChild(newItem.view);
-            // !once ? thisItem.push(newItem) : parent[thisItem] = newItem;
             thisItem.push(newItem);
         }, {once:once});
         return btn;

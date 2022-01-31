@@ -32,33 +32,33 @@ export default class Operation {
         select.addEventListener('change', (e) => {
             this.update(data[e.target.value]);
         });
-        this.view.appendChild(select);
-    }
-
-    init(data = []) {
-        this.view.appendChild(this.mo.view);
-        this.view.appendChild(this.printrun.view);
-        this.view.appendChild(this.wastePersent.view);
-        this.view.appendChild(new Button(this, 'Добавить материал', Material, this.materials = [], {parent: this}));
-        this.view.appendChild(new Button(this, 'Добавить полуфабрикат', Product, this.halfproducts = [], {parent: this, title:''}));
-        this.title = data[0] ? data[0] : '';
-        this.type = data[1] ? data[1] : '';
-        this.wastePersent.value = data[2] ? data[2] : '';
+        return select;
     }
 
     update(data) {
         this.title = data[0];
         this.type = data[1];
         this.wastePersent.value = data[2];
-        this.printrun.value = this.#printrunCalc(this.parent.printrun.value);
+        this.printrun.value = this.#calcField('printrun', this.parent.printrun.value);
     }
 
     render() {
-        this.select();
-    }
 
-    #printrunCalc(value) {
-        return Math.ceil(Math.ceil(value / (1 - this.wastePersent.value/100))/this.mo.value);
+        let inputsWrapper = document.createElement('div');
+        inputsWrapper.classList.add('field', 'is-grouped');
+
+        inputsWrapper.appendChild(this.select());
+        inputsWrapper.appendChild(this.mo.view);
+        inputsWrapper.appendChild(this.wastePersent.view);
+        inputsWrapper.appendChild(this.printrun.view);
+
+        this.view.appendChild(inputsWrapper);
+
+        let btnWrapper = document.createElement('div');
+        btnWrapper.classList.add('buttons');
+        btnWrapper.appendChild(new Button(this, 'Добавить материал', Material, this.materials = [], {parent: this}));
+        btnWrapper.appendChild(new Button(this, 'Добавить полуфабрикат', Product, this.halfproducts = [], {parent: this, title:''}));
+        this.view.appendChild(btnWrapper);        
     }
 
     #calcField(field,value) {
@@ -75,14 +75,14 @@ export default class Operation {
         if (this.halfproducts) {
             for(let halfproduct of this.halfproducts) {
                 if (halfproduct[field]) {
-                    halfproduct.updateField(field,this.#calcField(field, value),false);
+                    halfproduct.updateField(field,this[field].value,false);
                 }
             }
         }        
         if (this.materials) {
             for(let material of this.materials) {
                 if (material[field]) {
-                    material.updateField(field,this.#calcField(field, value),false);
+                    material.updateField(field,this[field].value,false);
                 }
             }
         }        
@@ -98,17 +98,16 @@ export default class Operation {
         * printrun         Тираж
         * mo               Доля
         */
-        for (let key in data) {
-            this[key] = data[key];
-        };
-        this.wastePersent = new Input(this, 'wastePersent', this.parent.wastePersent ? this.parent.wastePersent.value : 0, '% техотходов', 'number', true, '');
+
+        this.parent = data.parent;
+
+        this.wastePersent = new Input(this, 'wastePersent', 0, '% техотходов', 'number', true, '');
         this.mo = new Input(this, 'mo', 1, 'Доля', 'number', true);
         this.printrun = new Input(this, 'printrun', this.#calcField('printrun',this.parent.printrun.value), 'Тираж', 'number', true, 'disabled');
 
         this.view = document.createElement('div');
         this.view.classList.add('box', 'operation');
         this.render();
-        this.init();        
         
         //=========================DEBUG===================================
         this.view.addEventListener('click', (e)=> {
