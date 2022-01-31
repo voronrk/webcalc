@@ -58,25 +58,31 @@ export default class Operation {
     }
 
     #printrunCalc(value) {
-        return Math.ceil(value / (1 - this.wastePersent.value/100));
+        return Math.ceil(Math.ceil(value / (1 - this.wastePersent.value/100))/this.mo.value);
     }
 
     #calcField(field,value) {
         if (field=='printrun') {
-            return Math.ceil(value / (1 - this.wastePersent.value/100));
+            return Math.ceil(Math.ceil(value / (1 - this.wastePersent.value/100))/this.mo.value);
         };
         return value;
-
     }
 
     updateField(field, value, internal=false) {
         if (!internal) {
-                this[field].value = this.#calcField(field, value);
+            this[field].value = this.#calcField(field, value);
         };
         if (this.halfproducts) {
             for(let halfproduct of this.halfproducts) {
                 if (halfproduct[field]) {
                     halfproduct.updateField(field,this.#calcField(field, value),false);
+                }
+            }
+        }        
+        if (this.materials) {
+            for(let material of this.materials) {
+                if (material[field]) {
+                    material.updateField(field,this.#calcField(field, value),false);
                 }
             }
         }        
@@ -89,16 +95,15 @@ export default class Operation {
         * materials        Материалы
         * wastePersent     Процент техотходов
         * wasteQuantity    Количество техотходов
-        * printrunOutput   Выходной тираж
-        * printrunInput    Входной тираж
+        * printrun         Тираж
         * mo               Доля
         */
         for (let key in data) {
             this[key] = data[key];
         };
-        this.wastePersent = new Input(this, 'wastePersent', this.parent.wastePersent ? this.parent.wastePersent.value : 0, '% техотходов', 'number', true, 'disabled');
-        this.mo = new Input(this, 'mo', '', 'Доля', 'number', true);
-        this.printrun = new Input(this, 'printrun', this.#printrunCalc(this.parent.printrun.value), 'Тираж', 'number', true, 'disabled');
+        this.wastePersent = new Input(this, 'wastePersent', this.parent.wastePersent ? this.parent.wastePersent.value : 0, '% техотходов', 'number', true, '');
+        this.mo = new Input(this, 'mo', 1, 'Доля', 'number', true);
+        this.printrun = new Input(this, 'printrun', this.#calcField('printrun',this.parent.printrun.value), 'Тираж', 'number', true, 'disabled');
 
         this.view = document.createElement('div');
         this.view.classList.add('box', 'operation');

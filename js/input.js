@@ -22,7 +22,6 @@ export default class Input {
         this.inputType = inputType;
         
         this.disabled = disabled;
-        console.log(this);
 
         this.view = document.createElement('div');
         this.view.classList.add('field');

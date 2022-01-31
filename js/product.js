@@ -8,7 +8,7 @@ export default class Product {
         let inputsWrapper = document.createElement('div');
         inputsWrapper.classList.add('block');
         for(let key in this) {
-            if ((!(key=='parent')) && (this[key].view)) {
+            if ((!(key=='parent')) && (!(key=='children')) && (this[key].view)) {
                 inputsWrapper.appendChild(this[key].view)
             };
         };
@@ -38,26 +38,30 @@ export default class Product {
         /*
         *   title
         *   printrun
+        *   x
+        *   y
+        *   z
         */
-        for (let key in data) {
-            if (!(typeof(data[key])==='object')) {
-                let placeholder = '';
-                let type = 'text';
-                if (key==='title') {
-                    placeholder = 'Название';
-                };
-                if (key==='printrun') {
-                    placeholder = 'Тираж';
-                    type = 'number';
-                }
-                this[key] = new Input(this, key, data[key], placeholder, type, true);
-            } else {
-                this[key] = data[key];
-            };
-        };
-        if (!this.printrun) {
-            this.printrun = new Input(this, 'printrun', this.parent.printrun.value, 'Тираж', 'number', true);
-        };
+
+        this.title = new Input(this, 'title', '', 'Название', 'text', true);
+        this.printrun = new Input(this, 'printrun', '', 'Тираж', 'number', true);
+        this.x = new Input(this, 'x', '', 'X', 'number', true);
+        this.y = new Input(this, 'y', '', 'Y', 'number', true);
+        this.z = new Input(this, 'z', '', 'Z', 'number', true);
+        
+        if (data.parent) {
+            this.printrun.value = data.parent.printrun;
+            this.x.value = data.parent.x;
+            this.y.value = data.parent.y;
+            this.z.value = data.parent.z;
+        } else {
+            this.title.value = data.title;
+            this.printrun.value = data.printrun;
+            this.x.value = data.x;
+            this.y.value = data.y;
+            this.z.value = data.z;
+        }
+
         this.view = document.createElement('div');
         this.view.classList.add('box', 'product');
         this.render();
