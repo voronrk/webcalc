@@ -5,7 +5,7 @@ import Input from "./input.js";
 
 export default class Operation {
 
-    select() {
+    select_DEPRECATED() {
         const data=[
             ['Фальцовка', 'Фальцовка', 1],
             ['Подборка', 'Подборка', 2],
@@ -47,7 +47,7 @@ export default class Operation {
         let inputsWrapper = document.createElement('div');
         inputsWrapper.classList.add('field', 'is-grouped');
 
-        inputsWrapper.appendChild(this.select());
+        // inputsWrapper.appendChild(this.select());
         inputsWrapper.appendChild(this.mo.view);
         inputsWrapper.appendChild(this.wastePersent.view);
         inputsWrapper.appendChild(this.printrun.view);
@@ -68,21 +68,25 @@ export default class Operation {
         return value;
     }
 
-    updateField(field, value, internal=false) {
+    update(field, value, internal=false) {
+        console.log(field,value,internal)
         if (!internal) {
             this[field].value = this.#calcField(field, value);
+        };
+        if ((field=='wastePersent') && (internal) && (this.printrun)) {
+            this.update('printrun',this.#calcField('printrun',this.parent.printrun.value),false);
         };
         if (this.halfproducts) {
             for(let halfproduct of this.halfproducts) {
                 if (halfproduct[field]) {
-                    halfproduct.updateField(field,this[field].value,false);
+                    halfproduct.update(field,this[field].value,false);
                 }
             }
         }        
         if (this.materials) {
             for(let material of this.materials) {
                 if (material[field]) {
-                    material.updateField(field,this[field].value,false);
+                    material.update(field,this[field].value,false);
                 }
             }
         }        
@@ -101,7 +105,7 @@ export default class Operation {
 
         this.parent = data.parent;
 
-        this.wastePersent = new Input(this, 'wastePersent', 0, '% техотходов', 'number', true, '');
+        this.wastePersent = new Input(this, 'wastePersent', data.wastePersent, '% техотходов', 'number', true, '');
         this.mo = new Input(this, 'mo', 1, 'Доля', 'number', true);
         this.printrun = new Input(this, 'printrun', this.#calcField('printrun',this.parent.printrun.value), 'Тираж', 'number', true, 'disabled');
 

@@ -1,21 +1,20 @@
 export default class Input {
 
     #value;
-    #internal;
+    #flag;
 
     set value(value) {
         this.#value = value;
         this.view.querySelector('input').value = value;
-        this.parent.updateField(this.title, value, this.#internal);
-        // this.#internal = false;
+        this.parent.update(this.title, value, this.#flag);
     }
 
     get value() {
         return this.#value;
     }
 
-    constructor (parent, title = '', value = '', placeholder = '', inputType = 'text', internal=false, disabled = '') {
-        this.#internal = internal;
+    constructor (parent, title = '', value = '', placeholder = '', inputType = 'text', flag='init', disabled = '') {
+        this.#flag = flag;
         this.parent = parent;
         this.title = title;
         this.placeholder = placeholder;
@@ -30,9 +29,9 @@ export default class Input {
             <div class="control">
                 <input class="input is-small" type=${this.inputType} placeholder=${this.placeholder} ${this.disabled}>
             </div>`;
-        this.view.querySelector('input').addEventListener('blur', (e) => {
+        this.view.querySelector('input').addEventListener('change', (e) => {
             this.value = e.target.value;
-            this.#internal = true;
+            this.#flag = 'int';
         });
         this.value = value;
     }

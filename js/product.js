@@ -3,6 +3,42 @@ import Input from "./input.js";
 import Operation from "./operation.js";
 
 export default class Product {
+
+    children = [];
+
+    #selectOperation() {
+        const data=[
+            ['Фальцовка', 'Фальцовка', 1],
+            ['Подборка', 'Подборка', 2],
+            ['Шитьё', 'Шитьё', 3],
+            ['Печать', 'Печать', 4],
+            ['Обрезка', 'Обрезка', 5],
+            ['Ламинация', 'Ламинация', 6],
+            ['Резка', 'Резка', 7]
+        ];
+        let select = document.createElement('div');
+        select.classList.add('select', 'is-small');
+        select.innerHTML = `
+        <select>
+            <option value='0'>Фальцовка</option>
+            <option value='1'>Подборка</option>
+            <option value='2'>Шитьё</option>
+            <option value='3'>Печать</option>
+            <option value='4'>Обрезка</option>
+            <option value='5'>Ламинация</option>
+            <option value='6'>Резка</option>
+        </select>
+        `;
+        select.children[0].value = '';
+        select.addEventListener('change', (e) => {
+            let operParam = data[e.target.value];
+            let newOperation = new Operation({parent:this, wastePersent:operParam[2], title: operParam[0], type: operParam[1]});
+            this.children = [newOperation];
+            this.operationWrapper.innerHTML = '';
+            this.operationWrapper.appendChild(newOperation.view);
+        });
+        return select;
+    }
     
     render() {
         let inputsWrapper = document.createElement('div');
@@ -16,21 +52,34 @@ export default class Product {
 
         let btnWrapper = document.createElement('div');
         btnWrapper.classList.add('buttons');
-        btnWrapper.appendChild(new Button(this, 'Выбрать техоперацию', Operation, this.children=[], {parent: this}, true));
+        // btnWrapper.appendChild(new Button(this, 'Выбрать техоперацию', Operation, this.children=[], {parent: this}, true));
+        btnWrapper.appendChild(this.#selectOperation());
         this.view.appendChild(btnWrapper);
+
+        this.operationWrapper = document.createElement('div');
+        this.view.appendChild(this.operationWrapper);
     }
 
-    updateField(field, value, internal=true) {
-        if (!internal) {
-            this[field].value = value;
-        };
-        if (this.children) {
-            for(let child of this.children) {
-                if (child[field]) {
-                    child.updateField(field,value,false);
+    #updateOthers(entities, field, value, flag) {
+        if (entities) {
+            for(let entity of entities) {
+                if (entity[field]) {
+                    entity.update(field,value,flag);
                 }
             }
-        }        
+        };
+    }
+
+    update(field, value, flag='int') {     //flag = ['int', 'by-parent', 'by-child', 'init']
+        if (!(flag==='int') && (!(flag==='init'))) {
+            this[field].value = value;
+        };
+        if ((flag==='by-parent') || (flag==='int')){
+            this.#updateOthers(this.children, field, value, 'by-parent');
+        };
+        if ((flag==='by-child') || (flag==='int')){
+            this.#updateOthers(this.parent, field, value, 'by-child');
+        };        
     }
 
     constructor(data) {
@@ -42,11 +91,11 @@ export default class Product {
         *   z
         */
 
-        this.title = new Input(this, 'title', '', 'Название', 'text', true);
-        this.printrun = new Input(this, 'printrun', '', 'Тираж', 'number', true);
-        this.x = new Input(this, 'x', '', 'X', 'number', true);
-        this.y = new Input(this, 'y', '', 'Y', 'number', true);
-        // this.z = new Input(this, 'z', '', 'Z', 'number', true);
+        this.title = new Input(this, 'title', '', 'Название', 'text', 'init');
+        this.printrun = new Input(this, 'printrun', '', 'Тираж', 'number', 'init');
+        this.x = new Input(this, 'x', '', 'X', 'number', 'init');
+        this.y = new Input(this, 'y', '', 'Y', 'number', 'init');
+        // this.z = new Input(this, 'z', '', 'Z', 'number', init);
         
         if (data.parent) {
             this.printrun.value = data.parent.printrun.value;
