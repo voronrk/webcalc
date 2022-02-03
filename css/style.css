@@ -5,3 +5,7 @@
 .operation {
     border: 2px solid green;
 }
+
+.suboperation {
+    border: 2px solid violet;
+}

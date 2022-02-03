@@ -8,13 +8,13 @@ export default class Product {
 
     #selectOperation() {
         const data=[
-            ['Фальцовка', 'Фальцовка', 1],
-            ['Подборка', 'Подборка', 2],
-            ['Шитьё', 'Шитьё', 3],
-            ['Печать', 'Печать', 4],
-            ['Обрезка', 'Обрезка', 5],
-            ['Ламинация', 'Ламинация', 6],
-            ['Резка', 'Резка', 7]
+            ['Фальцовка', {wasteNumber:10}, {wastePersent:1}],
+            ['Подборка', {wasteNumber:1}, {wastePersent:2}],
+            ['Шитьё', {wasteNumber:5}, {wastePersent:5}],
+            ['Печать', {wasteNumber:20}, {wastePersent:2}],
+            ['Обрезка', {wasteNumber:1}, {wastePersent:1}],
+            ['Ламинация', {wasteNumber:5}, {wastePersent:3}],
+            ['Резка', {wasteNumber:1}, {wastePersent:1}]
         ];
         let select = document.createElement('div');
         select.classList.add('select', 'is-small');
@@ -32,7 +32,7 @@ export default class Product {
         select.children[0].value = '';
         select.addEventListener('change', (e) => {
             let operParam = data[e.target.value];
-            let newOperation = new Operation({parent:this, wastePersent:operParam[2], title: operParam[0], type: operParam[1]});
+            let newOperation = new Operation({parent:this, title: operParam[0], priladka: operParam[1], click: operParam[2]});
             this.children = [newOperation];
             this.operationWrapper.innerHTML = '';
             this.operationWrapper.appendChild(newOperation.view);
@@ -52,7 +52,6 @@ export default class Product {
 
         let btnWrapper = document.createElement('div');
         btnWrapper.classList.add('buttons');
-        // btnWrapper.appendChild(new Button(this, 'Выбрать техоперацию', Operation, this.children=[], {parent: this}, true));
         btnWrapper.appendChild(this.#selectOperation());
         this.view.appendChild(btnWrapper);
 
@@ -71,6 +70,7 @@ export default class Product {
     }
 
     update(field, value, flag='int') {     //flag = ['int', 'by-parent', 'by-child', 'init']
+        console.log(field, value, flag);
         if (!(flag==='int') && (!(flag==='init'))) {
             this[field].value = value;
         };

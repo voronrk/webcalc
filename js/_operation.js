@@ -2,7 +2,6 @@ import Material from "./material.js";
 import Product from "./product.js";
 import Button from "./button.js";
 import Input from "./input.js";
-import Suboperation from "./suboperation.js";
 
 export default class Operation {
 
@@ -45,17 +44,14 @@ export default class Operation {
 
     render() {
 
-        this.view.innerHTML = `<div class='block is-size-7'>${this.title}</div>`;
-
-        let suboperationsWrapper = document.createElement('div');
-        suboperationsWrapper.classList.add('columns');
-        suboperationsWrapper.appendChild(this.priladka.view);
-        suboperationsWrapper.appendChild(this.click.view);
-        this.view.appendChild(suboperationsWrapper);
+        this.view.innerHTML = `<div class='block'>${this.title}</div>`;
 
         let inputsWrapper = document.createElement('div');
         inputsWrapper.classList.add('field', 'is-grouped');
 
+        // inputsWrapper.appendChild(this.select());
+        inputsWrapper.appendChild(this.mo.view);
+        inputsWrapper.appendChild(this.wastePersent.view);
         inputsWrapper.appendChild(this.printrun.view);
 
         this.view.appendChild(inputsWrapper);
@@ -69,7 +65,10 @@ export default class Operation {
 
     #calcField(field,value) {
         if (field=='printrun') {
-            return this.priladka.printrun.value + this.click.printrun.value + this.parent.printrun.value;
+            return Math.ceil(Math.ceil(value / (1 - this.wastePersent.value/100))/this.mo.value);
+        };
+        if (field=='wastePersent') {
+            return Math.ceil(Math.ceil(value / (1 - this.wastePersent.value/100))/this.mo.value);
         };
         return value;
     }
@@ -103,18 +102,22 @@ export default class Operation {
         * halfproducts     Полуфабрикаты
         * materials        Материалы
         * wastePersent     Процент техотходов
-        * wasteNumber      Количество техотходов
-        * printrun         Тираж (входной)
+        * wasteCount       Количество техотходов
+        * printrun         Тираж
         * mo               Доля
         */
 
         this.parent = data.parent;
         this.title = data.title;
 
-        this.priladka = new Suboperation(data.parent, 'Приладка', data.priladka);
-        this.click = new Suboperation(data.parent, 'Прогон', data.click);
-
-        // this.mo = new Input(this, 'mo', 1, 'Доля', 'number', 'init');
+        if (data.wastePersent) {
+            this.wastePersent = new Input(this, 'wastePersent', data.wastePersent, '% техотходов', 'number', 'init', '');
+        };
+        if (data.wasteCount) {
+            this.wasteCount = new Input(this, 'wasteCount', data.wasteCount, 'Количество техотходов', 'number', 'init', '');
+        };
+        
+        this.mo = new Input(this, 'mo', 1, 'Доля', 'number', 'init');
         this.printrun = new Input(this, 'printrun', this.#calcField('printrun',this.parent.printrun.value), 'Тираж', 'number', 'init', 'disabled');
 
         this.view = document.createElement('div');
