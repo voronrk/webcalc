@@ -30,8 +30,8 @@ export default class Input {
                 <input class="input is-small" type=${this.inputType} placeholder=${this.placeholder} ${this.disabled}>
             </div>`;
         this.view.querySelector('input').addEventListener('change', (e) => {
-            this.value = e.target.value;
             this.#flag = 'int';
+            this.value = e.target.value;            
         });
         this.value = value;
     }

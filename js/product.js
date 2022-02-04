@@ -8,13 +8,13 @@ export default class Product {
 
     #selectOperation() {
         const data=[
-            ['Фальцовка', {wasteNumber:10}, {wastePersent:1}],
-            ['Подборка', {wasteNumber:1}, {wastePersent:2}],
-            ['Шитьё', {wasteNumber:5}, {wastePersent:5}],
-            ['Печать', {wasteNumber:20}, {wastePersent:2}],
-            ['Обрезка', {wasteNumber:1}, {wastePersent:1}],
-            ['Ламинация', {wasteNumber:5}, {wastePersent:3}],
-            ['Резка', {wasteNumber:1}, {wastePersent:1}]
+            ['Фальцовка', [{title: 'Приладка', wasteNumber:10}, {title: 'Прогон', wastePersent:1}]],
+            ['Подборка', [{title: 'Приладка', wasteNumber:1}, {title: 'Прогон', wastePersent:2}]],
+            ['Шитьё', [{title: 'Приладка', wasteNumber:5}, {title: 'Прогон', wastePersent:5}]],
+            ['Печать', [{title: 'Приладка', wasteNumber:20}, {title: 'Прогон', wastePersent:2}]],
+            ['Обрезка', [{title: 'Приладка', wasteNumber:1}, {title: 'Прогон', wastePersent:1}]],
+            ['Ламинация', [{title: 'Приладка', wasteNumber:5}, {title: 'Прогон', wastePersent:3}]],
+            ['Резка', [{title: 'Приладка', wasteNumber:1}, {title: 'Прогон', wastePersent:1}]]
         ];
         let select = document.createElement('div');
         select.classList.add('select', 'is-small');
@@ -32,7 +32,7 @@ export default class Product {
         select.children[0].value = '';
         select.addEventListener('change', (e) => {
             let operParam = data[e.target.value];
-            let newOperation = new Operation({parent:this, title: operParam[0], priladka: operParam[1], click: operParam[2]});
+            let newOperation = new Operation({parent:this, title: operParam[0], suboperations: operParam[1]});
             this.children = [newOperation];
             this.operationWrapper.innerHTML = '';
             this.operationWrapper.appendChild(newOperation.view);
@@ -70,16 +70,16 @@ export default class Product {
     }
 
     update(field, value, flag='int') {     //flag = ['int', 'by-parent', 'by-child', 'init']
-        console.log(field, value, flag);
+        console.log('product |',field, value, flag);
         if (!(flag==='int') && (!(flag==='init'))) {
             this[field].value = value;
         };
         if ((flag==='by-parent') || (flag==='int')){
             this.#updateOthers(this.children, field, value, 'by-parent');
         };
-        if ((flag==='by-child') || (flag==='int')){
-            this.#updateOthers(this.parent, field, value, 'by-child');
-        };        
+        // if ((flag==='by-child') || (flag==='int')){
+        //     this.#updateOthers(this.parent, field, value, 'by-child');
+        // };        
     }
 
     constructor(data) {

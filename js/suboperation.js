@@ -26,32 +26,56 @@ export default class Suboperation {
             } else {
                 return 0;
             }
-            
-        };
-        if (field=='wastePersent') {
-            return Math.ceil(Math.ceil(value / (1 - this.wastePersent.value/100))/this.mo.value);
         };
         return value;
     }
 
-    update(field, value, flag='int') {
-
+    #updateOthers(entities, field, value, flag) {
+        if (entities) {
+            for(let entity of entities) {
+                if (entity[field]) {
+                    entity.update(field,value,flag);
+                }
+            }
+        };
     }
 
-    constructor(parent, title, data) {
+    update(field, value, flag='int') {
+        console.log('suboperation |',field,value,flag);
+        if (!(flag==='int') && (!(flag==='init'))) {
+            this[field].value = value;
+        };
+        if (flag==='int') {
+            if ((field==='wastePersent') || (field==='wasteNumber')) {
+                this.update('printrun', this.#calcField('printrun',this.parent.parent.printrun.value), 'by-this');
+            };
+        };
+        if (flag==='by-this') {
+            if (field==='printrun') {                
+                this.parent.update('printrun', this.printrun.value, 'by-sub');
+            };  
+        };
+        if (flag==='by-parent') {
+            if (field==='printrun') {                
+                this.update('printrun', this.#calcField('printrun',this.parent.parent.printrun.value), 'by-this');
+            };  
+        };
+    }
+
+    constructor(parent, data) {
         /*
         * title            Название
-        * halfproducts     Полуфабрикаты
-        * materials        Материалы
         * wastePersent     Процент техотходов
         * wasteNumber      Количество техотходов
-        * printrun         Тираж
+        * printrun         Количество техотходов
         * mo               Доля
         */
 
         this.parent = parent;
-        this.title = title;
 
+        if (data.title) {
+            this.title = data.title;
+        };
         if (data.wastePersent) {
             this.wastePersent = new Input(this, 'wastePersent', data.wastePersent, '% техотходов', 'number', 'init', '');
         };
@@ -60,7 +84,7 @@ export default class Suboperation {
         };
         
         // this.mo = new Input(this, 'mo', 1, 'Доля', 'number', 'init');
-        this.printrun = new Input(this, 'printrun', this.#calcField('printrun',this.parent.printrun.value), 'Количество', 'number', 'init', 'disabled');
+        this.printrun = new Input(this, 'printrun', this.#calcField('printrun',this.parent.parent.printrun.value), 'Количество', 'number', 'init', 'disabled');
 
         this.view = document.createElement('div');
         this.view.classList.add('suboperation', 'column');

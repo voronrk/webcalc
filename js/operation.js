@@ -6,6 +6,8 @@ import Suboperation from "./suboperation.js";
 
 export default class Operation {
 
+    suboperations = [];
+
     select_DEPRECATED() {
         const data=[
             ['Фальцовка', 'Фальцовка', 1],
@@ -36,12 +38,12 @@ export default class Operation {
         return select;
     }
 
-    update(data) {
-        this.title = data[0];
-        this.type = data[1];
-        this.wastePersent.value = data[2];
-        this.printrun.value = this.#calcField('printrun', this.parent.printrun.value);
-    }
+    // update(data) {
+    //     this.title = data[0];
+    //     this.type = data[1];
+    //     this.wastePersent.value = data[2];
+    //     this.printrun.value = this.#calcField('printrun', this.parent.printrun.value);
+    // }
 
     render() {
 
@@ -49,8 +51,9 @@ export default class Operation {
 
         let suboperationsWrapper = document.createElement('div');
         suboperationsWrapper.classList.add('columns');
-        suboperationsWrapper.appendChild(this.priladka.view);
-        suboperationsWrapper.appendChild(this.click.view);
+        for (let suboperation of this.suboperations) {
+            suboperationsWrapper.appendChild(suboperation.view);    
+        };
         this.view.appendChild(suboperationsWrapper);
 
         let inputsWrapper = document.createElement('div');
@@ -69,32 +72,47 @@ export default class Operation {
 
     #calcField(field,value) {
         if (field=='printrun') {
-            return this.priladka.printrun.value + this.click.printrun.value + this.parent.printrun.value;
+            let result = +this.parent.printrun.value;
+            for (let suboperation of this.suboperations) {
+                result += +suboperation.printrun.value;
+            };
+            return result;
         };
         return value;
     }
 
     #updateOthers(entities, field, value, flag) {
         if (entities) {
-            for(let entity of entities) {
+            if (typeof(entities)=='object') {
+                for(let entity of entities) {
+                    if (entity[field]) {
+                        entity.update(field,value,flag);
+                    }
+                }
+            } else {
                 if (entity[field]) {
                     entity.update(field,value,flag);
                 }
-            }
+            }            
         };
     }
 
-    update(field, value, flag='int') {     //flag = ['int', 'by-parent', 'by-child', 'init']
-        console.log(field, value, flag);
-        if (!(flag==='int') && (!(flag==='init'))) {
+    update(field, value, flag='int') {     //flag = ['int', 'by-parent', 'by-child', 'by-sub', 'init', 'by-this']
+        console.log('operation |',field, value, flag);
+        if (!(flag==='int') && (!(flag==='init')) && (!(flag==='by-parent'))) {
             this[field].value = this.#calcField(field,value);
         };
-        if ((flag==='by-parent') || (flag==='int')){
-            this.#updateOthers(this.children, field, value, 'by-parent');
-        };
-        if ((flag==='by-child') || (flag==='int')){
-            this.#updateOthers(this.parent, field, value, 'by-child');
-        };        
+        if (flag==='by-sub') {
+            if (field==='printrun') {
+                this.update('printrun', this.#calcField('printrun',this.parent.printrun.value), 'by-this');
+                this.#updateOthers(this.halfproducts, 'printrun', this.printrun.value, 'by-parent');
+            }
+        }
+        if (flag==='by-parent') {
+            if (field==='printrun') {
+                this.#updateOthers(this.suboperations, 'printrun', value, 'by-parent');
+            }
+        }
     }
 
     constructor(data) {
@@ -111,8 +129,9 @@ export default class Operation {
         this.parent = data.parent;
         this.title = data.title;
 
-        this.priladka = new Suboperation(data.parent, 'Приладка', data.priladka);
-        this.click = new Suboperation(data.parent, 'Прогон', data.click);
+        for (let suboperation of data.suboperations) {
+            this.suboperations.push(new Suboperation(this, suboperation));
+        };
 
         // this.mo = new Input(this, 'mo', 1, 'Доля', 'number', 'init');
         this.printrun = new Input(this, 'printrun', this.#calcField('printrun',this.parent.printrun.value), 'Тираж', 'number', 'init', 'disabled');
