@@ -18,9 +18,9 @@ export default class Suboperation {
     }
 
     #calcField(field,value) {
-        if (field=='printrun') {
+        if ((field=='printrun') || (field=='mo')) {
             if (this.wastePersent) {
-                return Math.ceil(value * (this.wastePersent.value/100));
+                return Math.ceil((value / this.parent.mo.value) * (this.wastePersent.value/100));
             } else if (this.wasteNumber) {
                 return this.wasteNumber.value;
             } else {
@@ -40,26 +40,12 @@ export default class Suboperation {
         };
     }
 
-    update(field, value, flag='int') {
-        console.log('suboperation |',field,value,flag);
-        if (!(flag==='int') && (!(flag==='init'))) {
-            this[field].value = value;
-        };
-        if (flag==='int') {
-            if ((field==='wastePersent') || (field==='wasteNumber')) {
-                this.update('printrun', this.#calcField('printrun',this.parent.parent.printrun.value), 'by-this');
-            };
-        };
-        if (flag==='by-this') {
-            if (field==='printrun') {                
-                this.parent.update('printrun', this.printrun.value, 'by-sub');
-            };  
-        };
-        if (flag==='by-parent') {
-            if (field==='printrun') {                
-                this.update('printrun', this.#calcField('printrun',this.parent.parent.printrun.value), 'by-this');
-            };  
-        };
+    update(field, value, flag='by-int') {
+
+        this[field].value = value;
+
+        this.printrun.value = this.#calcField('printrun',this.parent.parent.printrun.value);
+        this.parent.update(field, value, 'by-sub');
     }
 
     constructor(parent, data) {
@@ -68,7 +54,6 @@ export default class Suboperation {
         * wastePersent     Процент техотходов
         * wasteNumber      Количество техотходов
         * printrun         Количество техотходов
-        * mo               Доля
         */
 
         this.parent = parent;
@@ -77,14 +62,13 @@ export default class Suboperation {
             this.title = data.title;
         };
         if (data.wastePersent) {
-            this.wastePersent = new Input(this, 'wastePersent', data.wastePersent, '% техотходов', 'number', 'init', '');
+            this.wastePersent = new Input(this, 'wastePersent', data.wastePersent, '% техотходов', 'number', 'by-init', '');
         };
         if (data.wasteNumber) {
-            this.wasteNumber = new Input(this, 'wasteNumber', data.wasteNumber, 'Количество техотходов', 'number', 'init', '');
+            this.wasteNumber = new Input(this, 'wasteNumber', data.wasteNumber, 'Количество техотходов', 'number', 'by-init', '');
         };
         
-        // this.mo = new Input(this, 'mo', 1, 'Доля', 'number', 'init');
-        this.printrun = new Input(this, 'printrun', this.#calcField('printrun',this.parent.parent.printrun.value), 'Количество', 'number', 'init', 'disabled');
+        this.printrun = new Input(this, 'printrun', this.#calcField('printrun',this.parent.parent.printrun.value), 'Количество', 'number', 'by-init', 'disabled');
 
         this.view = document.createElement('div');
         this.view.classList.add('suboperation', 'column');

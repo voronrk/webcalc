@@ -6,14 +6,13 @@ export default class Input {
     set value(value) {
         this.#value = value;
         this.view.querySelector('input').value = value;
-        this.parent.update(this.title, value, this.#flag);
     }
 
     get value() {
         return this.#value;
     }
 
-    constructor (parent, title = '', value = '', placeholder = '', inputType = 'text', flag='init', disabled = '') {
+    constructor (parent, title = '', value = '', placeholder = '', inputType = 'text', flag='by-init', disabled = '') {
         this.#flag = flag;
         this.parent = parent;
         this.title = title;
@@ -30,8 +29,9 @@ export default class Input {
                 <input class="input is-small" type=${this.inputType} placeholder=${this.placeholder} ${this.disabled}>
             </div>`;
         this.view.querySelector('input').addEventListener('change', (e) => {
-            this.#flag = 'int';
-            this.value = e.target.value;            
+            this.#flag = 'by-int';
+            this.value = e.target.value;     
+            this.parent.update(this.title, e.target.value, this.#flag);       
         });
         this.value = value;
     }

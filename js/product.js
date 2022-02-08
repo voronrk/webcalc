@@ -69,15 +69,15 @@ export default class Product {
         };
     }
 
-    update(field, value, flag='int') {     //flag = ['int', 'by-parent', 'by-child', 'init']
+    update(field, value, flag='by-int') {     //flag = ['int', 'by-parent', 'by-child', 'init']
         console.log('product |',field, value, flag);
-        if (!(flag==='int') && (!(flag==='init'))) {
+        if (!(flag==='by-int') && (!(flag==='by-init'))) {
             this[field].value = value;
         };
-        if ((flag==='by-parent') || (flag==='int')){
+        if ((flag==='by-parent') || (flag==='by-int')){
             this.#updateOthers(this.children, field, value, 'by-parent');
         };
-        // if ((flag==='by-child') || (flag==='int')){
+        // if ((flag==='by-child') || (flag==='by-int')){
         //     this.#updateOthers(this.parent, field, value, 'by-child');
         // };        
     }
@@ -91,11 +91,11 @@ export default class Product {
         *   z
         */
 
-        this.title = new Input(this, 'title', '', 'Название', 'text', 'init');
-        this.printrun = new Input(this, 'printrun', '', 'Тираж', 'number', 'init');
-        this.x = new Input(this, 'x', '', 'X', 'number', 'init');
-        this.y = new Input(this, 'y', '', 'Y', 'number', 'init');
-        // this.z = new Input(this, 'z', '', 'Z', 'number', init);
+        this.title = new Input(this, 'title', '', 'Название', 'text', 'by-init');
+        this.printrun = new Input(this, 'printrun', '', 'Тираж', 'number', 'by-init');
+        this.x = new Input(this, 'x', '', 'X', 'number', 'by-init');
+        this.y = new Input(this, 'y', '', 'Y', 'number', 'by-init');
+        // this.z = new Input(this, 'z', '', 'Z', 'number', 'by-init');
         
         if (data.parent) {
             this.printrun.value = data.parent.printrun.value;

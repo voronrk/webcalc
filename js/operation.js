@@ -47,7 +47,7 @@ export default class Operation {
 
     render() {
 
-        this.view.innerHTML = `<div class='block is-size-7'>${this.title}</div>`;
+        this.view.innerHTML = `<div class='block is-size-7 has-text-weight-bold'>${this.title}</div>`;
 
         let suboperationsWrapper = document.createElement('div');
         suboperationsWrapper.classList.add('columns');
@@ -60,6 +60,7 @@ export default class Operation {
         inputsWrapper.classList.add('field', 'is-grouped');
 
         inputsWrapper.appendChild(this.printrun.view);
+        inputsWrapper.appendChild(this.mo.view);
 
         this.view.appendChild(inputsWrapper);
 
@@ -72,7 +73,7 @@ export default class Operation {
 
     #calcField(field,value) {
         if (field=='printrun') {
-            let result = +this.parent.printrun.value;
+            let result = Math.ceil(this.parent.printrun.value / this.mo.value);
             for (let suboperation of this.suboperations) {
                 result += +suboperation.printrun.value;
             };
@@ -97,22 +98,22 @@ export default class Operation {
         };
     }
 
-    update(field, value, flag='int') {     //flag = ['int', 'by-parent', 'by-child', 'by-sub', 'init', 'by-this']
-        console.log('operation |',field, value, flag);
-        if (!(flag==='int') && (!(flag==='init')) && (!(flag==='by-parent'))) {
-            this[field].value = this.#calcField(field,value);
-        };
+    update(field, value, flag='by-int') {     //flag = ['int', 'by-parent', 'by-child', 'by-sub', 'init', 'by-this']
+
+        this[field].value = value;
+        this.printrun.value = this.#calcField('printrun',this.parent.printrun.value);
+
+
         if (flag==='by-sub') {
-            if (field==='printrun') {
-                this.update('printrun', this.#calcField('printrun',this.parent.printrun.value), 'by-this');
-                this.#updateOthers(this.halfproducts, 'printrun', this.printrun.value, 'by-parent');
-            }
-        }
+            console.log('operation |',field, value, flag);
+            this.printrun.value = this.#calcField('printrun',this.parent.printrun.value);
+            this.#updateOthers(this.halfproducts, 'printrun', this.printrun.value, 'by-parent');
+        };
         if (flag==='by-parent') {
             if (field==='printrun') {
                 this.#updateOthers(this.suboperations, 'printrun', value, 'by-parent');
             }
-        }
+        };
     }
 
     constructor(data) {
@@ -129,12 +130,14 @@ export default class Operation {
         this.parent = data.parent;
         this.title = data.title;
 
+        this.mo = new Input(this, 'mo', 4, 'Доля', 'number', 'by-init');
+        this.printrun = new Input(this, 'printrun', this.#calcField('printrun',this.parent.printrun.value), 'Тираж', 'number', 'by-init', 'disabled');
+
         for (let suboperation of data.suboperations) {
             this.suboperations.push(new Suboperation(this, suboperation));
         };
-
-        // this.mo = new Input(this, 'mo', 1, 'Доля', 'number', 'init');
-        this.printrun = new Input(this, 'printrun', this.#calcField('printrun',this.parent.printrun.value), 'Тираж', 'number', 'init', 'disabled');
+        
+        this.printrun.value = this.#calcField('printrun',this.parent.printrun.value);
 
         this.view = document.createElement('div');
         this.view.classList.add('box', 'operation');
