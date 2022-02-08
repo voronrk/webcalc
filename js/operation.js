@@ -8,43 +8,6 @@ export default class Operation {
 
     suboperations = [];
 
-    select_DEPRECATED() {
-        const data=[
-            ['Фальцовка', 'Фальцовка', 1],
-            ['Подборка', 'Подборка', 2],
-            ['Шитьё', 'Шитьё', 3],
-            ['Печать', 'Печать', 4],
-            ['Обрезка', 'Обрезка', 5],
-            ['Ламинация', 'Ламинация', 6],
-            ['Резка', 'Резка', 7]
-        ];
-        let select = document.createElement('div');
-        select.classList.add('select', 'is-small');
-        select.innerHTML = `
-        <select>
-            <option value='0'>Фальцовка</option>
-            <option value='1'>Подборка</option>
-            <option value='2'>Шитьё</option>
-            <option value='3'>Печать</option>
-            <option value='4'>Обрезка</option>
-            <option value='5'>Ламинация</option>
-            <option value='6'>Резка</option>
-        </select>
-        `;
-        select.children[0].value = '';
-        select.addEventListener('change', (e) => {
-            this.update(data[e.target.value]);
-        });
-        return select;
-    }
-
-    // update(data) {
-    //     this.title = data[0];
-    //     this.type = data[1];
-    //     this.wastePersent.value = data[2];
-    //     this.printrun.value = this.#calcField('printrun', this.parent.printrun.value);
-    // }
-
     render() {
 
         this.view.innerHTML = `<div class='block is-size-7 has-text-weight-bold'>${this.title}</div>`;

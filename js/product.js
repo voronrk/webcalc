@@ -77,9 +77,6 @@ export default class Product {
         if ((flag==='by-parent') || (flag==='by-int')){
             this.#updateOthers(this.children, field, value, 'by-parent');
         };
-        // if ((flag==='by-child') || (flag==='by-int')){
-        //     this.#updateOthers(this.parent, field, value, 'by-child');
-        // };        
     }
 
     constructor(data) {
