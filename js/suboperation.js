@@ -20,7 +20,7 @@ export default class Suboperation {
     #calcField(field,value) {
         if ((field=='printrun') || (field=='mo')) {
             if (this.wastePersent) {
-                return Math.ceil((value / this.parent.mo.value) * (this.wastePersent.value/100));
+                return Math.ceil(value * (this.wastePersent.value/100));
             } else if (this.wasteNumber) {
                 return this.wasteNumber.value;
             } else {
@@ -44,7 +44,7 @@ export default class Suboperation {
 
         this[field].value = value;
 
-        this.printrun.value = this.#calcField('printrun',this.parent.parent.printrun.value);
+        this.printrun.value = this.#calcField('printrun',this.parent.clearPrintrun);
         this.parent.update(field, value, 'by-sub');
     }
 

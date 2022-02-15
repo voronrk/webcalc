@@ -8,13 +8,13 @@ export default class Product {
 
     #selectOperation() {
         const data=[
-            ['Фальцовка', [{title: 'Приладка', wasteNumber:10}, {title: 'Прогон', wastePersent:1}]],
-            ['Подборка', [{title: 'Приладка', wasteNumber:1}, {title: 'Прогон', wastePersent:2}]],
-            ['Шитьё', [{title: 'Приладка', wasteNumber:5}, {title: 'Прогон', wastePersent:5}]],
-            ['Печать', [{title: 'Приладка', wasteNumber:20}, {title: 'Прогон', wastePersent:2}]],
-            ['Обрезка', [{title: 'Приладка', wasteNumber:1}, {title: 'Прогон', wastePersent:1}]],
-            ['Ламинация', [{title: 'Приладка', wasteNumber:5}, {title: 'Прогон', wastePersent:3}]],
-            ['Резка', [{title: 'Приладка', wasteNumber:1}, {title: 'Прогон', wastePersent:1}]]
+            {title:'Фальцовка', mo: 1, suboperations:[{title: 'Приладка', wasteNumber:10}, {title: 'Прогон', wastePersent:1}]},
+            {title:'Подборка', mo: 1, suboperations:[{title: 'Приладка', wasteNumber:1}, {title: 'Прогон', wastePersent:2}]},
+            {title:'Шитьё', mo: 1, suboperations:[{title: 'Приладка', wasteNumber:5}, {title: 'Прогон', wastePersent:5}]},
+            {title:'Печать', mo: 8, suboperations:[{title: 'Приладка', wasteNumber:20}, {title: 'Прогон', wastePersent:2}]},
+            {title:'Обрезка', mo: 1, suboperations:[{title: 'Приладка', wasteNumber:1}, {title: 'Прогон', wastePersent:1}]},
+            {title:'Ламинация', mo: 1, suboperations:[{title: 'Приладка', wasteNumber:5}, {title: 'Прогон', wastePersent:3}]},
+            {title:'Резка', mo: 2, suboperations:[{title: 'Приладка', wasteNumber:1}, {title: 'Прогон', wastePersent:1}]},
         ];
         let select = document.createElement('div');
         select.classList.add('select', 'is-small');
@@ -32,7 +32,7 @@ export default class Product {
         select.children[0].value = '';
         select.addEventListener('change', (e) => {
             let operParam = data[e.target.value];
-            let newOperation = new Operation({parent:this, title: operParam[0], suboperations: operParam[1]});
+            let newOperation = new Operation({parent:this, title: operParam['title'], mo: operParam['mo'], suboperations: operParam['suboperations']});
             this.children = [newOperation];
             this.operationWrapper.innerHTML = '';
             this.operationWrapper.appendChild(newOperation.view);
@@ -95,6 +95,7 @@ export default class Product {
         // this.z = new Input(this, 'z', '', 'Z', 'number', 'by-init');
         
         if (data.parent) {
+            this.parent = data.parent;
             this.printrun.value = data.parent.printrun.value;
             this.x.value = data.parent.x;
             this.y.value = data.parent.y;

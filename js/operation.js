@@ -34,9 +34,14 @@ export default class Operation {
         this.view.appendChild(btnWrapper);        
     }
 
+    get clearPrintrun() {
+        let moParent = this.parent.parent ? this.parent.parent.mo.value : 1;
+        return Math.ceil(this.parent.printrun.value / (this.mo.value/moParent));
+    }
+
     #calcField(field,value) {
         if (field=='printrun') {
-            let result = Math.ceil(this.parent.printrun.value / this.mo.value);
+            let result = this.clearPrintrun;
             for (let suboperation of this.suboperations) {
                 result += +suboperation.printrun.value;
             };
@@ -62,18 +67,20 @@ export default class Operation {
     }
 
     update(field, value, flag='by-int') {     //flag = ['int', 'by-parent', 'by-child', 'by-sub', 'init', 'by-this']
+        console.log('operation |',field, value, flag);
 
-        this[field].value = value;
+        if (this[field]) {
+            this[field].value = value;
+        };        
         this.printrun.value = this.#calcField('printrun',this.parent.printrun.value);
 
-
         if (flag==='by-sub') {
-            console.log('operation |',field, value, flag);
+            
             this.printrun.value = this.#calcField('printrun',this.parent.printrun.value);
             this.#updateOthers(this.halfproducts, 'printrun', this.printrun.value, 'by-parent');
         };
-        if (flag==='by-parent') {
-            if (field==='printrun') {
+        if ((flag==='by-parent') || (flag==='by-int')){
+            if ((field==='printrun') || (field==='mo')) {
                 this.#updateOthers(this.suboperations, 'printrun', value, 'by-parent');
             }
         };
@@ -92,8 +99,9 @@ export default class Operation {
 
         this.parent = data.parent;
         this.title = data.title;
+        this.moParent = this.parent.parent ? this.parent.parent.mo.value : 1;
 
-        this.mo = new Input(this, 'mo', 4, 'Доля', 'number', 'by-init');
+        this.mo = new Input(this, 'mo', data.mo, 'Доля', 'number', 'by-init');
         this.printrun = new Input(this, 'printrun', this.#calcField('printrun',this.parent.printrun.value), 'Тираж', 'number', 'by-init', 'disabled');
 
         for (let suboperation of data.suboperations) {
