@@ -13,23 +13,11 @@ export default class Operation {
         this.view.innerHTML = `<div class='block is-size-7 has-text-weight-bold'>${this.title}</div>`;
 
         let suboperationsWrapper = document.createElement('div');
-        suboperationsWrapper.classList.add('columns', 'box');
-        if (this.suboperations) {
-            for (let suboperation of this.suboperations) {
-                suboperationsWrapper.appendChild(suboperation.view);    
-            };
-        }        
+        suboperationsWrapper.classList.add('columns');
+        for (let suboperation of this.suboperations) {
+            suboperationsWrapper.appendChild(suboperation.view);    
+        };
         this.view.appendChild(suboperationsWrapper);
-        
-        let materialsWrapper = document.createElement('div');
-        materialsWrapper.classList.add('columns', 'box');
-        materialsWrapper.appendChild(new Button(this, 'Добавить материал', Material, this.materials = [], {parent: this.materials}));
-        if (this.materials) {
-            for (let material of this.materials) {
-                materialsWrapper.appendChild(material.view);    
-            };
-        }        
-        this.view.appendChild(materialsWrapper);
 
         let inputsWrapper = document.createElement('div');
         inputsWrapper.classList.add('field', 'is-grouped');
@@ -41,7 +29,7 @@ export default class Operation {
 
         let btnWrapper = document.createElement('div');
         btnWrapper.classList.add('buttons');
-        
+        btnWrapper.appendChild(new Button(this, 'Добавить материал', Material, this.materials = [], {parent: this}));
         btnWrapper.appendChild(new Button(this, 'Добавить полуфабрикат', Product, this.halfproducts = [], {parent: this, title:''}));
         this.view.appendChild(btnWrapper);        
     }
@@ -101,11 +89,8 @@ export default class Operation {
     constructor(data) {
         /*
         * title            Название
-        *
-        * products         Полуфабрикаты
+        * halfproducts     Полуфабрикаты
         * materials        Материалы
-        * suboperations    Субоперации
-        * 
         * wastePersent     Процент техотходов
         * wasteNumber      Количество техотходов
         * printrun         Тираж (входной)
@@ -119,18 +104,9 @@ export default class Operation {
         this.mo = new Input(this, 'mo', data.mo, 'Доля', 'number', 'by-init');
         this.printrun = new Input(this, 'printrun', this.#calcField('printrun',this.parent.printrun.value), 'Тираж', 'number', 'by-init', 'disabled');
 
-        if (data.suboperations) {
-            for (let suboperation of data.suboperations) {
-                this.suboperations.push(new Suboperation(this, suboperation));
-            };
+        for (let suboperation of data.suboperations) {
+            this.suboperations.push(new Suboperation(this, suboperation));
         };
-        
-        if (data.materials) {
-            for (let material of data.materials) {
-                this.materials.push(new Material(this, material));
-            };
-        };
-        
         
         this.printrun.value = this.#calcField('printrun',this.parent.printrun.value);
 

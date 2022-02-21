@@ -90,21 +90,21 @@ export default class Product {
 
         this.title = new Input(this, 'title', '', 'Название', 'text', 'by-init');
         this.printrun = new Input(this, 'printrun', '', 'Тираж', 'number', 'by-init');
-        this.x = new Input(this, 'x', '', 'X', 'number', 'by-init');
-        this.y = new Input(this, 'y', '', 'Y', 'number', 'by-init');
+        // this.x = new Input(this, 'x', '', 'X', 'number', 'by-init');
+        // this.y = new Input(this, 'y', '', 'Y', 'number', 'by-init');
         // this.z = new Input(this, 'z', '', 'Z', 'number', 'by-init');
         
         if (data.parent) {
             this.parent = data.parent;
             this.printrun.value = data.parent.printrun.value;
-            this.x.value = data.parent.x;
-            this.y.value = data.parent.y;
+            // this.x.value = data.parent.x;
+            // this.y.value = data.parent.y;
             // this.z.value = data.parent.z;
         } else {
             this.title.value = data.title;
             this.printrun.value = data.printrun;
-            this.x.value = data.x;
-            this.y.value = data.y;
+            // this.x.value = data.x;
+            // this.y.value = data.y;
             // this.z.value = data.z;
         }
 

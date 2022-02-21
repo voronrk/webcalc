@@ -44,7 +44,7 @@ export default class Suboperation {
 
         this[field].value = value;
 
-        this.printrun.value = this.#calcField('printrun',this.parent.clearPrintrun);
+        this.printrun.value = this.#calcField('printrun',this.parent.purePrintrun);
         this.parent.update(field, value, 'by-sub');
     }
 
@@ -62,13 +62,13 @@ export default class Suboperation {
             this.title = data.title;
         };
         if (data.wastePersent) {
-            this.wastePersent = new Input(this, 'wastePersent', data.wastePersent, '% техотходов', 'number', 'by-init', '');
+            this.wastePersent = new Input(this, 'wastePersent', data.wastePersent, 'Норма техотходов, %', 'number', 'by-init', '');
         };
         if (data.wasteNumber) {
-            this.wasteNumber = new Input(this, 'wasteNumber', data.wasteNumber, 'Количество техотходов', 'number', 'by-init', '');
+            this.wasteNumber = new Input(this, 'wasteNumber', data.wasteNumber, 'Норма техотходов, шт.', 'number', 'by-init', '');
         };
         
-        this.printrun = new Input(this, 'printrun', this.#calcField('printrun',this.parent.parent.printrun.value), 'Количество', 'number', 'by-init', 'disabled');
+        this.printrun = new Input(this, 'printrun', this.#calcField('printrun',this.parent.parent.printrun.value), 'Кол-во техотходов', 'number', 'by-init', 'disabled');
 
         this.view = document.createElement('div');
         this.view.classList.add('suboperation', 'column');
