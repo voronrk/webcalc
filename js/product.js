@@ -1,6 +1,6 @@
-import Button from "./button.js";
-import Input from "./input.js";
-import Operation from "./operation.js";
+import Button from "./Button.js";
+import Input from "./Input.js";
+import Operation from "./Operation.js";
 
 export default class Product {
 
@@ -62,22 +62,27 @@ export default class Product {
     #updateOthers(entities, field, value, flag) {
         if (entities) {
             for(let entity of entities) {
-                if (entity[field]) {
-                    entity.update(field,value,flag);
-                }
+                entity.update();
+                // if (entity[field]) {
+                //     entity.update(field,value,flag);
+                // }
             }
         };
     }
 
-    update(field, value, flag='by-int') {     //flag = ['int', 'by-parent', 'by-child', 'init']
-        console.log('product |',field, value, flag);
-        if (!(flag==='by-int') && (!(flag==='by-init'))) {
-            this[field].value = value;
-        };
-        if ((flag==='by-parent') || (flag==='by-int')){
-            this.#updateOthers(this.children, field, value, 'by-parent');
-        };
+    update(flag) {     //flag = ['int', 'by-parent', 'by-child', 'init']
+        this.#updateOthers(this.children);
     }
+
+    // update(field, value, flag='by-int') {     //flag = ['int', 'by-parent', 'by-child', 'init']
+    //     console.log('product |',field, value, flag);
+    //     if (!(flag==='by-int') && (!(flag==='by-init'))) {
+    //         this[field].value = value;
+    //     };
+    //     if ((flag==='by-parent') || (flag==='by-int')){
+    //         this.#updateOthers(this.children, field, value, 'by-parent');
+    //     };
+    // }
 
     constructor(data) {
         /*

@@ -1,4 +1,4 @@
-import Input from "./input.js";
+import Input from "./Input.js";
 
 export default class Suboperation {
 
@@ -17,17 +17,16 @@ export default class Suboperation {
         this.view.appendChild(inputsWrapper);
     }
 
-    #calcField(field,value) {
+    #calcField(field) {
         if ((field=='printrun') || (field=='mo')) {
             if (this.wastePersent) {
-                return Math.ceil(value * (this.wastePersent.value/100));
+                return this.printrunOut + Math.ceil(this.printrunOut * (this.wastePersent.value/100));
             } else if (this.wasteNumber) {
                 return this.wasteNumber.value;
             } else {
                 return 0;
             }
         };
-        return value;
     }
 
     #updateOthers(entities, field, value, flag) {
@@ -40,23 +39,31 @@ export default class Suboperation {
         };
     }
 
-    update(field, value, flag='by-int') {
-
-        this[field].value = value;
-
-        this.printrun.value = this.#calcField('printrun',this.parent.purePrintrun);
-        this.parent.update(field, value, 'by-sub');
+    update(flag) {
+        switch (flag) {
+            case 'by-int':
+                this.printrun.value = this.#calcField('printrun');
+                this.parent.update('by-sub');
+                break;
+            case 'by-parent':
+                this.printrunOut = this.parent.purePrintrun;
+                this.printrun.value = this.#calcField('printrun');
+                this.parent.update('by-sub');
+                break;
+        }
     }
 
-    constructor(parent, data) {
-        /*
+    constructor(parent, printrunOut, data) {
+       /*
         * title            Название
         * wastePersent     Процент техотходов
         * wasteNumber      Количество техотходов
-        * printrun         Количество техотходов
+        * printrun         Тираж (потребность)
+        * printrunOut      Тираж (выходной)
         */
 
         this.parent = parent;
+        this.printrunOut = printrunOut;
 
         if (data.title) {
             this.title = data.title;
@@ -68,7 +75,7 @@ export default class Suboperation {
             this.wasteNumber = new Input(this, 'wasteNumber', data.wasteNumber, 'Норма техотходов, шт.', 'number', 'by-init', '');
         };
         
-        this.printrun = new Input(this, 'printrun', this.#calcField('printrun',this.parent.parent.printrun.value), 'Кол-во техотходов', 'number', 'by-init', 'disabled');
+        this.printrun = new Input(this, 'printrun', this.#calcField('printrun'), 'Кол-во', 'number', 'by-init', 'disabled');
 
         this.view = document.createElement('div');
         this.view.classList.add('suboperation', 'column');

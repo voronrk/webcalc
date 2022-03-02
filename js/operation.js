@@ -1,8 +1,8 @@
-import Material from "./material.js";
-import Product from "./product.js";
-import Button from "./button.js";
-import Input from "./input.js";
-import Suboperation from "./suboperation.js";
+import Material from "./Material.js";
+import Product from "./Product.js";
+import Button from "./Button.js";
+import Input from "./Input.js";
+import Suboperation from "./Suboperation.js";
 
 export default class Operation {
 
@@ -53,7 +53,7 @@ export default class Operation {
 
     #calcField(field,value) {
         if (field=='printrun') {
-            let result = this.purePrintrun;
+            let result = 0;
             for (let suboperation of this.suboperations) {
                 result += +suboperation.printrun.value;
             };
@@ -62,40 +62,33 @@ export default class Operation {
         return value;
     }
 
-    #updateOthers(entities, field, value, flag) {
+    #updateOthers(entities, flag) {
         if (entities) {
             if (typeof(entities)=='object') {
                 for(let entity of entities) {
-                    if (entity[field]) {
-                        entity.update(field,value,flag);
-                    }
+                    entity.update(flag);
                 }
             } else {
-                if (entity[field]) {
-                    entity.update(field,value,flag);
-                }
+                entity.update(flag);
             }            
         };
     }
 
-    update(field, value, flag='by-int') {     //flag = ['int', 'by-parent', 'by-child', 'by-sub', 'init', 'by-this']
-        console.log('operation |',field, value, flag);
+    update(flag) {
 
-        if (this[field]) {
-            this[field].value = value;
-        };        
-        this.printrun.value = this.#calcField('printrun',this.parent.printrun.value);
-
-        if (flag==='by-sub') {
-            
-            this.printrun.value = this.#calcField('printrun',this.parent.printrun.value);
-            this.#updateOthers(this.halfproducts, 'printrun', this.printrun.value, 'by-parent');
-        };
-        if ((flag==='by-parent') || (flag==='by-int')){
-            if ((field==='printrun') || (field==='mo')) {
-                this.#updateOthers(this.suboperations, 'printrun', value, 'by-parent');
-            }
-        };
+        switch (flag) {
+            case 'by-sub':
+                this.printrun.value = this.#calcField('printrun',this.parent.printrun.value);
+                this.#updateOthers(this.halfproducts, 'by-parent');
+                break;
+            case 'by-int':
+                this.#updateOthers(this.suboperations, 'by-parent');
+                break;
+            case 'by-parent':
+                this.printrun.value = this.#calcField('printrun',this.parent.printrun.value);
+                this.#updateOthers(this.suboperations, 'by-parent');
+                break;
+        }
     }
 
     constructor(data) {
@@ -106,8 +99,6 @@ export default class Operation {
         * materials        Материалы
         * suboperations    Субоперации
         * 
-        * wastePersent     Процент техотходов
-        * wasteNumber      Количество техотходов
         * printrun         Тираж (входной)
         * mo               Доля
         */
@@ -120,8 +111,8 @@ export default class Operation {
         this.printrun = new Input(this, 'printrun', this.#calcField('printrun',this.parent.printrun.value), 'Тираж', 'number', 'by-init', 'disabled');
 
         if (data.suboperations) {
-            for (let suboperation of data.suboperations) {
-                this.suboperations.push(new Suboperation(this, suboperation));
+            for (let suboperation of data.suboperations.reverse()) {
+                this.suboperations.unshift(new Suboperation(this, this.purePrintrun, suboperation));
             };
         };
         

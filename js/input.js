@@ -31,7 +31,7 @@ export default class Input {
         this.view.querySelector('input').addEventListener('change', (e) => {
             this.#flag = 'by-int';
             this.value = e.target.value;     
-            this.parent.update(this.title, e.target.value, this.#flag);       
+            this.parent.update(this.#flag);
         });
         this.value = value;
     }
