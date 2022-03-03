@@ -59,30 +59,20 @@ export default class Product {
         this.view.appendChild(this.operationWrapper);
     }
 
-    #updateOthers(entities, field, value, flag) {
+    #updateOthers(entities, flag) {
         if (entities) {
             for(let entity of entities) {
-                entity.update();
-                // if (entity[field]) {
-                //     entity.update(field,value,flag);
-                // }
+                entity.update(flag);
             }
         };
     }
 
-    update(flag) {     //flag = ['int', 'by-parent', 'by-child', 'init']
-        this.#updateOthers(this.children);
+    update(flag) {     //flag = ['by-int', 'by-parent', 'by-child', 'by-init']
+        if (this.parent) {
+            this.printrun.value = this.parent.printrun.value;
+        };        
+        this.#updateOthers(this.children, 'by-parent');
     }
-
-    // update(field, value, flag='by-int') {     //flag = ['int', 'by-parent', 'by-child', 'init']
-    //     console.log('product |',field, value, flag);
-    //     if (!(flag==='by-int') && (!(flag==='by-init'))) {
-    //         this[field].value = value;
-    //     };
-    //     if ((flag==='by-parent') || (flag==='by-int')){
-    //         this.#updateOthers(this.children, field, value, 'by-parent');
-    //     };
-    // }
 
     constructor(data) {
         /*

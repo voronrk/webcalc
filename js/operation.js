@@ -85,8 +85,9 @@ export default class Operation {
                 this.#updateOthers(this.suboperations, 'by-parent');
                 break;
             case 'by-parent':
-                this.printrun.value = this.#calcField('printrun',this.parent.printrun.value);
                 this.#updateOthers(this.suboperations, 'by-parent');
+                this.printrun.value = this.#calcField('printrun',this.parent.printrun.value);                
+                this.#updateOthers(this.halfproducts, 'by-parent');
                 break;
         }
     }
